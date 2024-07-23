@@ -1,22 +1,74 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import dash from '../assets/images/dash.jpg';
 import '../assets/styles/Clientes.css';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:3000/clients/')
-      .then(response => response.json())
-      .then(data => setClientes(data))
-      .catch(error => console.error('Error fetching clients:', error));
+    const fetchClients = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://3.229.4.197:3000/clients/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setClientes(data);
+        } else {
+          setError('Unexpected response format');
+        }
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+        setError('Error fetching clients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClients();
   }, []);
 
   const handleCardClick = (id) => {
     navigate(`/detalle/${id}`);
   };
+
+  const handleAccountClick = () => {
+    Swal.fire({
+      title: '¿DESEAS CERRAR SESIÓN?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No',
+      icon: 'warning',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token'); // Eliminar el token del almacenamiento local
+        Swal.fire('Sesión cerrada', '', 'success').then(() => {
+          navigate('/login'); // Navegar a la página de inicio de sesión
+        });
+      }
+    });
+  };
+
+  if (loading) {
+    return <p>Cargando clientes...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <div className='clientes-container'>
@@ -48,7 +100,7 @@ export default function Clientes() {
               </Link>
             </li>
             <li>
-              <Link to="/cuenta">
+              <Link to="#" onClick={handleAccountClick}>
                 <i className="fa-regular fa-user"></i>
                 <span className='link-name'>Cuenta</span>
               </Link>
@@ -68,7 +120,7 @@ export default function Clientes() {
         <h1 className='title'>Clientes</h1>
         <div className='cards-containerdos'>
           {clientes.length === 0 ? (
-            <p>Cargando clientes...</p>
+            <p>No hay clientes disponibles</p>
           ) : (
             clientes.map((cliente, index) => (
               <div key={index} className='cardos' onClick={() => handleCardClick(cliente.id)}>

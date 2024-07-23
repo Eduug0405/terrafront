@@ -4,23 +4,37 @@ import logo from '../assets/images/login.jpg';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const user = users.find(u => u.nombre === username && u.password === password);
+    try {
+      const response = await fetch('http://3.229.4.197:3000/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    if (user) {
-      localStorage.setItem('token', 'fake-jwt-token'); // Este es un token falso para indicar que el usuario está autenticado
-      console.log('Login exitoso:', user);
-      navigate('/analisis');
-    } else {
-      setError('Usuario o contraseña incorrectos');
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token); 
+        console.log('Login exitoso:', data);
+        console.log(data);
+        navigate('/analisis');
+      } else {
+        const errorText = await response.text();
+        setError('Email o contraseña incorrectos');
+        console.error('Error al iniciar sesión:', errorText);
+      }
+    } catch (err) {
+      setError('Error al iniciar sesión');
+      console.error('Error al iniciar sesión:', err);
     }
   };
 
@@ -32,13 +46,13 @@ const Login = () => {
           <h2>BIENVENIDO</h2>
           <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <label htmlFor="username">Usuario</label>
+              <label htmlFor="email">Email</label>
               <input 
                 type="text" 
-                id="username" 
-                name="username" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
+                id="email" 
+                name="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
                 required 
               />
             </div>

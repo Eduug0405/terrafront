@@ -4,11 +4,14 @@ import registroimg from '../assets/images/Registro.jpg';
 
 function Registro() {
   const [formData, setFormData] = useState({
-    nombre: '',
+    name: '',
     email: '',
-    telefono: '',
+    number_contact: '',
     password: ''
   });
+
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,15 +21,33 @@ function Registro() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { nombre, email, telefono, password } = formData;
+    try {
+      const response = await fetch('http://3.229.4.197:3000/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const newUser = { nombre, email, telefono, password };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    console.log('Registro exitoso:', newUser);
+      if (response.ok) {
+        const data = await response.json();
+        setSuccess('Registro exitoso!');
+        setError('');
+        console.log('Registro exitoso:', data);
+      } else {
+        const errorText = await response.text();
+        setError('Error al registrar usuario: ' + errorText);
+        setSuccess('');
+        console.error('Error al registrar usuario:', errorText);
+      }
+    } catch (err) {
+      setError('Error al registrar usuario');
+      setSuccess('');
+      console.error('Error al registrar usuario:', err);
+    }
   };
 
   return (
@@ -38,22 +59,24 @@ function Registro() {
         <h1>Bienvenido, por favor regístrese</h1>
         <form className="registro-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
-            <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
+            <label htmlFor="name">Nombre</label>
+            <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label htmlFor="telefono">Teléfono</label>
-            <input type="tel" id="telefono" name="telefono" value={formData.telefono} onChange={handleChange} required />
+            <label htmlFor="number_contact">Teléfono</label>
+            <input type="tel" id="number_contact" name="number_contact" value={formData.number_contact} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
             <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
           </div>
           <button type="submit" className="btn-submit">Registrarse</button>
+          {error && <p className="error-message">{error}</p>}
+          {success && <p className="success-message">{success}</p>}
         </form>
       </div>
     </div>

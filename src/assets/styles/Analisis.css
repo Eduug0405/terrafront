@@ -34,6 +34,15 @@ body {
   --background-color: #2c3e50;
   --text-color: #ecf0f1;
   --panel-color: #34495e;
+  --text-color: #ffffff;
+}
+
+.analisis-container.dark h2,
+.analisis-container.dark h3,
+.analisis-container.dark h4,
+.analisis-container.dark p,
+.logo_name {
+  color: white;
 }
 
 nav {
@@ -341,5 +350,3 @@ button[type='button'] {
 button[type='button']:hover {
   background-color: var(--primary-color);
 }
-
-

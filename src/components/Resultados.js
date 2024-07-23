@@ -9,6 +9,7 @@ import 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart } from 'chart.js';
 import '../assets/styles/Resultados.css';
+import GeneratePdf from './GeneratoPdf';
 
 Modal.setAppElement('#root'); // Ensure the modal is accessible
 
@@ -43,8 +44,15 @@ export default function Resultados() {
   const cultivosList = ['Café', 'Cacao', 'Maíz', 'Mango', 'Caña', 'Plátano', 'Frijol', 'Cacahuate', 'Calabaza', 'Cebolla', 'Aguacate'];
 
   const fetchAnalysis = async () => {
+    const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:3000/results/${id}`);
+      const response = await fetch(`http://3.229.4.197:3000/results/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await response.json();
       setAnalysis(data[id]);
       setLoading(false);
@@ -111,7 +119,7 @@ export default function Resultados() {
       if (result.isConfirmed) {
         setIsStarting(true);
         try {
-          const response = await fetch('http://localhost:3000/mqtt', {
+          const response = await fetch('http://3.229.4.197:3000/mqtt', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -160,7 +168,7 @@ export default function Resultados() {
       if (result.isConfirmed) {
         setIsStarting(true);
         try {
-          const response = await fetch('http://localhost:3000/mqtt', {
+          const response = await fetch('http://3.229.4.197:3000/mqtt', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -262,6 +270,12 @@ export default function Resultados() {
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
+  const hasData =
+    analysis.resultados_general.data_analysis.length > 0 ||
+    Object.keys(analysis.resultados_general.resultados_analysis).length > 0;
+
+  const isResultsAvailable = analysis && analysis.zonas && Object.keys(analysis.zonas).length > 0;
+  const isGeneralResultsAvailable = analysis && analysis.resultados_general && Object.keys(analysis.resultados_general.resultados_analysis).length > 0;
 
   return (
     <div className="mycontainer">
@@ -281,10 +295,15 @@ export default function Resultados() {
           <button 
             onClick={() => navigate('/ganilli', { state: { analysis } })}
             className="generate-graph-button"
+
           >
             Generar gráfica general
           </button>
-
+          {hasData ? (
+        <GeneratePdf analysis={analysis} />
+      ) : (
+        <p>No hay datos disponibles para generar el PDF</p>
+      )}
           <div>
             <h3>Resultados Generales:</h3>
             {Object.keys(analysis.resultados_general.resultados_analysis).length > 0 ? (
@@ -318,14 +337,16 @@ export default function Resultados() {
                     <button 
                       className="generate-graph-button"
                       onClick={() => handleGenerateGraph(key)}
+                      disabled={!analysis.zonas[key].resultados_cultivos || Object.keys(analysis.zonas[key].resultados_cultivos).length === 0}
                     >
                       Generar gráfica
                     </button>
                     <button 
-                      className="pdf-result-button"
+                      className="generate-pdf-button"
                       onClick={() => handleDownloadPdf(key)}
+                      disabled={!analysis.zonas[key].resultados_cultivos || Object.keys(analysis.zonas[key].resultados_cultivos).length === 0}
                     >
-                      Resultados en PDF
+                      Generar PDF
                     </button>
                   </div>
                   <div className="zone-content">

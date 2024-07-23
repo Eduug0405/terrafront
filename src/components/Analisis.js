@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import '../assets/styles/Analisis.css';
 import dash from '../assets/images/dash.jpg';
 
@@ -18,17 +19,36 @@ export default function Analisis() {
     locate: '',
     zones: []
   });
+  
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const handleToggle = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
   useEffect(() => {
-    fetch('http://localhost:3000/analysis')
-      .then(response => response.json())
-      .then(data => setCards(data))
-      .catch(error => console.error('Error fetching data:', error));
-  }, []);
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch('http://3.229.4.197:3000/analysis', {
+          method: 'GET',
+          headers: {
+            'Authorization': `${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCards(data);
+        } else {
+          console.error('Error fetching data:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchAnalysis();
+  }, [token]);
 
   const handleOpenModal = () => setIsModalOpen(true);
 
@@ -55,7 +75,6 @@ export default function Analisis() {
 
   const handleZoneChange = (index, e) => {
     const { name, value } = e.target;
-    console.log('paso');
     setNewAnalysis(prevState => {
       const newZones = [...prevState.zones];
       newZones[index] = {
@@ -67,7 +86,6 @@ export default function Analisis() {
   };
 
   const addZone = () => {
-    console.log('paso');
     setNewAnalysis(prevState => ({
       ...prevState,
       zones: [...prevState.zones, { indications: '', depth: 0 }]
@@ -76,11 +94,11 @@ export default function Analisis() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(newAnalysis)
     try {
-      const response = await fetch('http://localhost:3000/analysis', {
+      const response = await fetch('http://3.229.4.197:3000/analysis', {
         method: 'POST',
         headers: {
+          'Authorization': `${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(newAnalysis)
@@ -112,8 +130,11 @@ export default function Analisis() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/analysis/${id}`, {
-        method: 'DELETE'
+      const response = await fetch(`http://3.229.4.197:3000/analysis/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `${token}`
+        }
       });
 
       if (response.ok) {
@@ -126,6 +147,23 @@ export default function Analisis() {
     } catch (error) {
       console.error('Error eliminando análisis:', error);
     }
+  };
+
+  const handleAccountClick = () => {
+    Swal.fire({
+      title: '¿DESEAS CERRAR SESIÓN?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No',
+      icon: 'warning',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token'); // Eliminar el token del almacenamiento local
+        Swal.fire('Sesión cerrada', '', 'success').then(() => {
+          navigate('/login'); // Navegar a la página de inicio de sesión
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -143,7 +181,7 @@ export default function Analisis() {
 
   return (
     <div className={`analisis-container ${isDarkMode ? 'dark' : ''}`}>
-     <nav>
+      <nav>
         <div className='logo-name'>
           <div className='logo-image'>
             <img src={dash} alt="logo" />
@@ -155,7 +193,7 @@ export default function Analisis() {
             <li>
               <Link to="/">
                 <i className="fa-solid fa-house"></i>
-                <span className='link-name'>Dashboard</span>
+                <span className='link-name'>Landing</span>
               </Link>
             </li>
             <li>
@@ -171,7 +209,7 @@ export default function Analisis() {
               </Link>
             </li>
             <li>
-              <Link to="/cuenta">
+              <Link to="#" onClick={handleAccountClick}>
                 <i className="fa-regular fa-user"></i>
                 <span className='link-name'>Cuenta</span>
               </Link>

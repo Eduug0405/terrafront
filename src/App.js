@@ -9,6 +9,7 @@ import Clientes from './components/Clientes';
 import Ganilli from './components/Ganilli';
 import Detalles from './components/Detalles';
 import PrivateRoute from './components/PrivateRoute';
+import GeneratePdf from './components/GeneratoPdf';
 
 export default function App() {
   return (
@@ -54,6 +55,15 @@ export default function App() {
           element={
             <PrivateRoute>
               <Detalles />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/GeneratePdf"
+          element={
+            <PrivateRoute>
+              <GeneratePdf />
             </PrivateRoute>
           }
         />
