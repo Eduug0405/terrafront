@@ -8,7 +8,6 @@ import Resultados from './components/Resultados';
 import Clientes from './components/Clientes';
 import Ganilli from './components/Ganilli';
 import Detalles from './components/Detalles';
-import PrivateRoute from './components/PrivateRoute';
 import GeneratePdf from './components/GeneratoPdf';
 
 export default function App() {
@@ -18,55 +17,12 @@ export default function App() {
         <Route path="/" element={<Principal />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route
-          path="/analisis"
-          element={
-            <PrivateRoute>
-              <Analisis />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/resultados/:id"
-          element={
-            <PrivateRoute>
-              <Resultados />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/clientes"
-          element={
-            <PrivateRoute>
-              <Clientes />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/ganilli"
-          element={
-            <PrivateRoute>
-              <Ganilli />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/detalle/:id"
-          element={
-            <PrivateRoute>
-              <Detalles />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/GeneratePdf"
-          element={
-            <PrivateRoute>
-              <GeneratePdf />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/analisis" element={<Analisis />} />
+        <Route path="/resultados/:id" element={<Resultados />} />
+        <Route path="/clientes" element={<Clientes />} />
+        <Route path="/ganilli" element={<Ganilli />} />
+        <Route path="/detalle/:id" element={<Detalles />} />
+        <Route path="/GeneratePdf" element={<GeneratePdf />} />
       </Routes>
     </BrowserRouter>
   );

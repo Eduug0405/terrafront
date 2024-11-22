@@ -46,7 +46,7 @@ export default function Resultados() {
   const fetchAnalysis = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://3.229.4.197:3000/results/${id}`, {
+      const response = await fetch(`http://localhost:3000/results/${id}`, {
         method: 'GET',
         headers: {
           'Authorization': `${token}`,
@@ -119,7 +119,7 @@ export default function Resultados() {
       if (result.isConfirmed) {
         setIsStarting(true);
         try {
-          const response = await fetch('http://3.229.4.197:3000/mqtt', {
+          const response = await fetch('http://localhost:3000/results/${id}', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

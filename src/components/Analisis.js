@@ -30,7 +30,7 @@ export default function Analisis() {
   useEffect(() => {
     const fetchAnalysis = async () => {
       try {
-        const response = await fetch('http://3.229.4.197:3000/analysis', {
+        const response = await fetch('http://localhost:3000/analysis', {
           method: 'GET',
           headers: {
             'Authorization': `${token}`,
@@ -95,7 +95,7 @@ export default function Analisis() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://3.229.4.197:3000/analysis', {
+      const response = await fetch('http://localhost:3000/analysis', {
         method: 'POST',
         headers: {
           'Authorization': `${token}`,
@@ -130,7 +130,7 @@ export default function Analisis() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://3.229.4.197:3000/analysis/${id}`, {
+      const response = await fetch(`http://localhost:3000/analysis/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `${token}`

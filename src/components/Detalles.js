@@ -10,7 +10,7 @@ export default function Detalles() {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetch(`http://3.229.4.197:3000/clients/${id}`, {
+    fetch(`http://localhost:3000/clients/${id}`, {
       method: 'GET',
       headers: {
         'Authorization': `${token}`,
@@ -23,7 +23,7 @@ export default function Detalles() {
   }, [id, token]);
 
   useEffect(() => {
-    fetch(`http://3.229.4.197:3000/clients/analysis/${id}`, {
+    fetch(`http://localhost:3000/clients/analysis/${id}`, {
       method: 'GET',
       headers: {
         'Authorization': `${token}`,
@@ -37,7 +37,7 @@ export default function Detalles() {
 
   const handleDelete = async (analisisId) => {
     try {
-      const response = await fetch(`http://3.229.4.197:3000/analysis/${analisisId}`, {
+      const response = await fetch(`http://localhost:3000/analysis/${analisisId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `${token}`

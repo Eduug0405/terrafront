@@ -14,7 +14,7 @@ export default function Clientes() {
     const fetchClients = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://3.229.4.197:3000/clients/', {
+        const response = await fetch('http://localhost:3000/clients/', {
           method: 'GET',
           headers: {
             'Authorization': `${token}`,
